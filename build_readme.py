@@ -60,14 +60,14 @@ def fetch_releases(oauth_token):
     after_cursor = None
 
     while has_next_page:
-        data = client.execute(
+        gh_data = client.execute(
             query=make_query(after_cursor),
             headers={"Authorization": "Bearer {}".format(oauth_token)},
         )
         print()
-        print(json.dumps(data, indent=4))
+        print(json.dumps(gh_data, indent=4))
         print()
-        for repo in data["data"]["viewer"]["repositories"]["nodes"]:
+        for repo in gh_data["data"]["viewer"]["repositories"]["nodes"]:
             if repo["releases"]["totalCount"] and repo["name"] not in repo_names:
                 repos.append(repo)
                 repo_names.add(repo["name"])
@@ -83,10 +83,10 @@ def fetch_releases(oauth_token):
                         "url": repo["releases"]["nodes"][0]["url"],
                     }
                 )
-        has_next_page = data["data"]["viewer"]["repositories"]["pageInfo"][
+        has_next_page = gh_data["data"]["viewer"]["repositories"]["pageInfo"][
             "hasNextPage"
         ]
-        after_cursor = data["data"]["viewer"]["repositories"]["pageInfo"]["endCursor"]
+        after_cursor = gh_data["data"]["viewer"]["repositories"]["pageInfo"]["endCursor"]
     return releases
 
 def fetch_blog_entries(access_token):
