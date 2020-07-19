@@ -8,7 +8,7 @@
 
 ### Meus posts no Medium
 <!-- blog starts -->
-<A ser preenchido>
+A ser preenchido
 <!-- blog ends -->
 [Ver mais posts](https://medium.com/@rafa_pei)
 </td></tr></table>
