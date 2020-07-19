@@ -1,5 +1,5 @@
 from python_graphql_client import GraphqlClient
-import feedparser
+import requests
 import httpx
 import json
 import pathlib
@@ -10,7 +10,9 @@ root = pathlib.Path(__file__).parent.resolve()
 client = GraphqlClient(endpoint="https://api.github.com/graphql")
 
 
-TOKEN = os.environ.get("SIMONW_TOKEN", "")
+MEDIUM_TOKEN = os.environ.get("MEDIUM_API_KEY", "")
+
+GITHUB_TOKEN = os.environ.get("GH_API_KEY", "")
 
 
 def replace_chunk(content, marker, chunk):
@@ -87,22 +89,14 @@ def fetch_releases(oauth_token):
         after_cursor = data["data"]["viewer"]["repositories"]["pageInfo"]["endCursor"]
     return releases
 
-
-def fetch_tils():
-    sql = "select title, url, created_utc from til order by created_utc desc limit 5"
-    return httpx.get(
-        "https://til.simonwillison.net/til.json",
-        params={"sql": sql, "_shape": "array",},
-    ).json()
-
-
-def fetch_blog_entries():
-    entries = feedparser.parse("https://simonwillison.net/atom/entries/")["entries"]
+def fetch_blog_entries(access_token):
+    header = {'Authorization': 'Bearer ' + access_token}
+    entries = requests.get('https://api.medium.com/v1/users/rafa_pei/publications', headers=header).json()["data"]
     return [
         {
-            "title": entry["title"],
-            "url": entry["link"].split("#")[0],
-            "published": entry["published"].split("T")[0],
+            "title": entry["name"],
+            "url": entry["url"],
+            "description": entry["description"],
         }
         for entry in entries
     ]
@@ -110,7 +104,7 @@ def fetch_blog_entries():
 
 if __name__ == "__main__":
     readme = root / "README.md"
-    releases = fetch_releases(TOKEN)
+    releases = fetch_releases(GITHUB_TOKEN)
     releases.sort(key=lambda r: r["published_at"], reverse=True)
     md = "\n".join(
         [
@@ -121,22 +115,9 @@ if __name__ == "__main__":
     readme_contents = readme.open().read()
     rewritten = replace_chunk(readme_contents, "recent_releases", md)
 
-    tils = fetch_tils()
-    tils_md = "\n".join(
-        [
-            "* [{title}]({url}) - {created_at}".format(
-                title=til["title"],
-                url=til["url"],
-                created_at=til["created_utc"].split("T")[0],
-            )
-            for til in tils
-        ]
-    )
-    rewritten = replace_chunk(rewritten, "tils", tils_md)
-
-    entries = fetch_blog_entries()[:5]
+    entries = fetch_blog_entries(MEDIUM_TOKEN)[:5]
     entries_md = "\n".join(
-        ["* [{title}]({url}) - {published}".format(**entry) for entry in entries]
+        ["* [{title}]({url}) - {description}".format(**entry) for entry in entries]
     )
     rewritten = replace_chunk(rewritten, "blog", entries_md)
 
