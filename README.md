@@ -22,7 +22,6 @@
 * [Weeknotes: cookiecutter templates, better plugin documentation, sqlite-generate](http://simonwillison.net/2020/Jun/26/weeknotes-plugins-sqlite-generate/) - 2020-06-26
 <!-- blog ends -->
 [Ver mais posts](https://medium.com/@rafa_pei)
-</td><td valign="top" width="33%">
 </td></tr></table>
 
 <a href="https://simonwillison.net/2020/Jul/10/self-updating-profile-readme/">Créditos e tutorial</a>
