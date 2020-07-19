@@ -28,7 +28,8 @@ jobs:
         python -m pip install -r requirements.txt
     - name: Update README
       env:
-        SIMONW_TOKEN: ${{ secrets.SIMONW_TOKEN }}
+        MEDIUM_API_KEY: ${{ secrets.MEDIUM_API_KEY }}
+        GH_API_KEY: ${{ secrets.GH_API_KEY }}
       run: |-
         python build_readme.py
         cat README.md
